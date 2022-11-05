@@ -43,11 +43,18 @@ export default function UserInfoCard() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    color: "fff",
     flexDirection: "column",
     justifyContent: "space-between",
+    backgroundColor: "#edede9",
     alignItems: "center",
+    maxWidth: 300,
+    borderRadius: 10,
     paddingHorizontal: 30,
     paddingVertical: 20,
+  },
+  text: {
+    color: "#fff"
   },
 
   image: {
