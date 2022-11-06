@@ -43,15 +43,15 @@ export default function UserInfoCard() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    color: "fff",
     flexDirection: "column",
     justifyContent: "space-between",
-    backgroundColor: "#edede9",
+    backgroundColor: '#f5f5f5',
+    elevation: 20,
+    shadowColor: '#52006A',
     alignItems: "center",
-    maxWidth: 300,
     borderRadius: 10,
     paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingVertical: 40,
   },
   text: {
     color: "#fff"

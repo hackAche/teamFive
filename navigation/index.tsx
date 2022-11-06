@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ActivityIndicator, ColorSchemeName, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ColorSchemeName, Pressable, StyleSheet, View,StatusBar } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -21,8 +21,8 @@ import LinkingConfiguration from './LinkingConfiguration';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
-import HomeScreen from '../screens/Home';
-import MapScreen from '../screens/Map';
+import HomeScreen from '../screens/HomeScreen';
+import MapScreen from '../screens/MapScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -66,17 +66,23 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
+      
       initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: '#9C27B0',
         tabBarInactiveTintColor: '#777',
         tabBarShowLabel: false,
-
+        headerStyle:{
+          backgroundColor: "#9C27B0",
+        },
+        headerTitleStyle:{
+          color: "#fff"
+        },
         tabBarIcon: ({ color, size }) => {
           let iconName;
           switch (route.name) {
             case 'Home':
-              iconName = 'home';
+              iconName = 'user';
               break;
             case 'Bus':
               iconName = 'mapPin';
@@ -101,21 +107,27 @@ function BottomTabNavigator() {
         name="Home"
         component={HomeScreen}
         options={({ navigation }: RootTabScreenProps<'Home'>) => ({
-          title: 'Início',
+          title: 'Minhas Informações',
+          headerBackground: (()=>(
+            <View>
+            <LinearGradient
+              style={styles.tabBarHeader}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              colors={['#D500F9', '#4A148C']}
+            >
+            </LinearGradient>
+
+          </View>
+          ))
         })}
       />
-      {/* <BottomTab.Screen
-        name="TabTwo"
-        component={Bus}
-        options={{
-          title: "Horários",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      /> */}
+    
       <BottomTab.Screen
         name="Bus"
         component={Bus}
         options={() => ({
+          title: 'Viajar',
           tabBarIcon: ({ color, focused }) => (
             <View>
               <LinearGradient
@@ -130,10 +142,42 @@ function BottomTabNavigator() {
               <Icon name="plus" size={26} color={Colors[colorScheme].text} />
             </View>
           ),
+          headerBackground: (()=>(
+            <View>
+            <LinearGradient
+              style={styles.tabBarHeader}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              colors={['#D500F9', '#4A148C']}
+            >
+            </LinearGradient>
+
+          </View>
+          ))
         })}
       />
 
       <BottomTab.Screen
+        name="Map"
+        component={MapScreen}
+        options={({ navigation }: RootTabScreenProps<'Map'>) => ({
+          title: 'Rotas e paradas',
+          headerBackground: (()=>(
+            <View>
+            <LinearGradient
+              style={styles.tabBarHeader}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              colors={['#D500F9', '#4A148C']}
+            >
+            </LinearGradient>
+
+          </View>
+          ))
+        })}
+      />
+
+      {/* <BottomTab.Screen
         name="Infos"
         component={Infos}
         options={({ navigation }: RootTabScreenProps<'Infos'>) => ({
@@ -150,23 +194,25 @@ function BottomTabNavigator() {
               <FontAwesome
                 name="info-circle"
                 size={25}
-                color={Colors[colorScheme].text}
+                color={Colors[colorScheme].white}
                 // style={{ marginRight: 15, }}
               />
             </Pressable>
           ),
-        })}
-      />
+          headerBackground: (()=>(
+            <View>
+            <LinearGradient
+              style={styles.tabBarHeader}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              colors={['#D500F9', '#4A148C']}
+            >
+            </LinearGradient>
 
-      <BottomTab.Screen
-        name="Map"
-        component={MapScreen}
-        options={({ navigation }: RootTabScreenProps<'Map'>) => ({
-          title: 'Paradas',
-          headerShown: false,
-          // tabBarIcon: ({ color }) => <Icon name="info" size={} color={color} />,
+          </View>
+          ))
         })}
-      />
+      /> */}
     </BottomTab.Navigator>
   );
 }
@@ -188,6 +234,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {},
+  tabBarHeader:{
+    color: "#9C27B0",
+    width: "100%",
+    height: "100%"
+  },
   iconTabRound: {
     width: 60,
     height: 60,

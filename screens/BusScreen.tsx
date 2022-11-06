@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Alert, SafeAreaView, StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
 
 import { useEffect, useState } from 'react';
@@ -10,74 +10,125 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
+import { LinearGradient } from 'expo-linear-gradient';
+
+import {
+  GetAllBusStopQuery,
+  useGetAllBusStopLazyQuery,
+  useGetAllBusStopQuery,
+} from '../graphql/generated';
+
+interface QRcodeProps {
+  document: string;
+  busStop: string;
+}
+
+interface UserInfoProps {
+  name: string;
+  document: string;
+  course: string;
+}
 
 export default function BusScreen() {
   const colorScheme = useColorScheme();
-  const [userName, setUserName] = useState<string>();
-  const [busStop, setBusStop] = useState<string>('');
+  const [busStopName, setBusStopName] = useState<string>('');
+  const { data, loading, error } = useGetAllBusStopQuery();
 
-  const data = [
-    {
-      label: 'Parada 1',
-      accessibilityLabel: 'Your label',
-    },
-    {
-      label: 'Parada 2',
-      accessibilityLabel: 'Your label',
-    },
-  ];
+  const [QRcodeString, setQRcodeString] = useState<QRcodeProps | null>(null);
 
+  const [userInfo, setUserInfo] = useState<UserInfoProps | null>();
   useEffect(() => {
-    AsyncStorage.setItem('@routeufpel:user', 'Darlei Matheus Schmegel');
     async function loadStorageUserName() {
-      const user = await AsyncStorage.getItem('@routeufpel:user');
-      setUserName(user || '');
+      const getUser = await AsyncStorage.getItem('@routeufpel:userInfo');
+      let user = (getUser ? JSON.parse(getUser) : null) as UserInfoProps;
+      setUserInfo(user);
     }
 
     loadStorageUserName();
   }, []);
-  return (
-    <View style={styles.container}>
-      <Text style={{ fontWeight: '500', fontSize: 15 }}>Selecione a parada você vai descer.</Text>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Picker
-          selectedValue={busStop}
-          style={{ height: 100, width: '90%', backgroundColor: Colors[colorScheme].purple, borderRadius: 8 }}
-          onValueChange={(itemValue, itemIndex) => setBusStop(itemValue)}
+  function handleSetQRcodeString(busStop: string) {
+    if (!userInfo) {
+      Alert.alert('Erro', 'Voce não está logado!');
+      return;
+    }
+    let qrinfo = {} as QRcodeProps;
+    qrinfo.busStop = busStop;
+    qrinfo.document = userInfo?.document;
+    const findName = data?.busStops.find((busStopMap) => busStopMap.id === busStop);
+    if (findName) {
+      setBusStopName(findName.name);
+    }
+    setQRcodeString(qrinfo);
+  }
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={{ fontWeight: '400', fontSize: 15 }}>
+        Para gerar o QRcode que deve ser mostrado na entrar no Onibus.
+      </Text>
+      <Text style={{ fontWeight: '400', fontSize: 15, marginBottom: 20 }}>
+        Selecione a{' '}
+        <Text style={{ fontWeight: '600', fontSize: 20, color: Colors[colorScheme].purple }}>
+          parada
+        </Text>{' '}
+        que você vai descer.
+      </Text>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
+        <LinearGradient
+          style={{ width: '90%', borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}
+          colors={['#D500F9', '#4A148C']}
         >
-          {data.map((d) => {
-            return <Picker.Item key={d.label} label={d.label} value={d.label} />;
-          })}
-        </Picker>
+          {loading && <Text>Carregando paradas...</Text>}
+          {data?.busStops && (
+            <Picker
+              selectedValue={QRcodeString?.busStop}
+              style={{ width: '90%', color: Colors[colorScheme].white }}
+              dropdownIconColor={Colors[colorScheme].white}
+              onValueChange={(itemValue, itemIndex) => handleSetQRcodeString(itemValue)}
+              mode="dropdown"
+            >
+              {data.busStops.map((busStops) => {
+                return <Picker.Item key={busStops.id} label={busStops.name} value={busStops.id} />;
+              })}
+            </Picker>
+          )}
+        </LinearGradient>
       </View>
 
       {/* {busStop !== "" && <Button variante="primary">Gerar Qrcode</Button>}  */}
 
-      {busStop !== '' && (
+      {QRcodeString && (
         <View style={styles.card}>
-          <QRCode size={250} value={busStop} />
+          <QRCode size={250} value={JSON.stringify(QRcodeString)} />
           <Text style={{}}></Text>
 
           <View style={{ backgroundColor: '#f5f5f5' }}>
             <Text style={{}}>
               <Text style={{ fontWeight: '700' }}>Nome: </Text>
-              {userName}
+              {userInfo?.name}
             </Text>
 
             <Text style={{}}>
-              <Text style={{ fontWeight: '700' }}>Curso:</Text> Engenharia de Computação
+              <Text style={{ fontWeight: '700' }}>Curso:</Text> {userInfo?.course}
             </Text>
             <Text style={{}}>
-              <Text style={{ fontWeight: '700' }}>Matricula:</Text> 18103368
+              <Text style={{ fontWeight: '700' }}>Matricula:</Text> {userInfo?.document}
             </Text>
             <Text style={{}}>
-              <Text style={{ fontWeight: '700' }}>Destino:</Text> {busStop}
+              <Text style={{ fontWeight: '700' }}>Destino:</Text> {busStopName}
             </Text>
           </View>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -85,6 +136,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    marginTop: 20,
     paddingHorizontal: 20,
   },
   card: {

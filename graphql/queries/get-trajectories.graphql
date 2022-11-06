@@ -1,0 +1,16 @@
+query getTrajectories{
+  trajectories(last: 50) {
+    id
+    name
+    departureTime
+    route {
+      id
+      name
+      busStops{
+        address
+        name
+        id
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+query getLineAnglo {
+  route(where: { id: "cla42i6sg2xeb0bm21eifzdjt" }) {
+    id
+    name
+    busStops {
+      id
+      name
+      address
+      location {
+        latitude
+        longitude
+      }
+      waitingCount
+    }
+  }
+}

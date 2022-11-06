@@ -2,12 +2,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text, TouchableOpacityProps } from 'react-native';
 
-import Icon from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/Feather';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 interface ButtonsProps extends TouchableOpacityProps {
   variante: 'primary' | 'secundary' | 'tertiary';
-  icon?: 'arrowleft' | 'save' | 'logout' | 'clouduploado' | 'upload' | 'reload1';
+  icon?: 'arrowleft' | 'save' | 'logout' | 'clouduploado' | 'upload' | 'refresh-cw';
 
   children?: string;
 }
@@ -29,14 +29,16 @@ export default function Button({ children, variante, icon, ...rest }: ButtonsPro
     );
   } else if (variante === 'secundary') {
     return (
-      <TouchableOpacity
-        style={[
-          {},
-          { backgroundColor: rest.disabled ? Colors[colorScheme].text : Colors[colorScheme].text },
-        ]}
-        {...rest}
-      >
-        {icon && <Icon name={icon} size={25} color={Colors[colorScheme].text} />}
+      <TouchableOpacity {...rest}>
+        <LinearGradient
+          style={styles.iconTabRound}
+          colors={['#D500F9', '#4A148C']}
+        >
+          <Text style={{ color: Colors[colorScheme].white, fontSize: 16 }}>
+          <Icon name={icon || 'info'} size={22} color={Colors[colorScheme].white} />
+          
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
     );
   } else {
@@ -77,5 +79,16 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginHorizontal: 75,
+  },
+  iconTabRound: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#9C27B0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 });

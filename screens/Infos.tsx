@@ -1,7 +1,12 @@
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+
+
+// Essa Sreen não foi usada. Podem iguinorar. 
+// Vamos implementá-la no futuro.
 
 export default function Infos() {
   return (

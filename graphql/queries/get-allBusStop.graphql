@@ -1,0 +1,12 @@
+query getAllBusStop {
+  busStops (last: 50){
+    address
+    name
+    id
+    waitingCount
+    location{
+      latitude
+      longitude
+    }
+  }
+}
